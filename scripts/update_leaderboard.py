@@ -20,6 +20,9 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+MOUNTAIN_TZ = ZoneInfo("America/Edmonton")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 INDEX_HTML = REPO_ROOT / "index.html"
@@ -236,8 +239,8 @@ def main() -> int:
     new_tbody = render_tbody(teams, player_index)
     html = re.sub(r"(<tbody>).*?(</tbody>)", lambda m: m.group(1) + new_tbody + m.group(2), html, flags=re.DOTALL)
 
-    now = datetime.now(timezone.utc)
-    stamp = now.strftime("%a %b %-d, %-I:%M %p UTC")
+    now = datetime.now(timezone.utc).astimezone(MOUNTAIN_TZ)
+    stamp = now.strftime("%a %b %-d, %-I:%M %p %Z")
     html = re.sub(
         r"(Last refreshed <strong>)[^<]*(</strong>)",
         lambda m: m.group(1) + stamp + m.group(2),
